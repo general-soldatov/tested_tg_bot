@@ -1,7 +1,7 @@
 import yaml
 from typing import List, Dict
 from pydantic import BaseModel
-from app.config.db import DB
+from app.config.models import DB
 
 class YamlProject(BaseModel):
     @classmethod
