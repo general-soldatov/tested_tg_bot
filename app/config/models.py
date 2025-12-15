@@ -1,6 +1,6 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 from datetime import datetime
-from typing import List
+from typing import List, Union
 
 class DataParent(BaseModel):
     views_count: int
@@ -11,8 +11,10 @@ class DataParent(BaseModel):
     updated_at: datetime
 
     @staticmethod
-    def to_datetime(text: str) -> datetime:
-        return datetime.fromisoformat(text)
+    def to_datetime(data_of_datetime: Union[str, datetime]) -> datetime:
+        if isinstance(data_of_datetime, str):
+            return datetime.fromisoformat(data_of_datetime)
+        return data_of_datetime
 
     @field_validator('created_at', mode='before')
     def validate_created_at(cls, data):
@@ -35,8 +37,11 @@ class VideosModel(DataParent):
     id: str
     creator_id: str
     video_created_at: datetime
-    snapshots: List[SnapshotsModel]
+    snapshots: Union[List[SnapshotsModel], None] = Field(exclude=True, default=None)
 
     @field_validator('video_created_at', mode='before')
     def validate_video_created_at(cls, data):
         return cls.to_datetime(data)
+
+class Video(BaseModel):
+    videos: List[VideosModel]

@@ -6,7 +6,7 @@ Base = declarative_base()
 class Videos(Base):
     __tablename__ = 'videos'
     id = Column(String, primary_key=True)
-    creator_id = Column(String, unique=True)
+    creator_id = Column(String)
     video_created_at = Column(DateTime)
     views_count = Column(Integer)
     likes_count = Column(Integer)
