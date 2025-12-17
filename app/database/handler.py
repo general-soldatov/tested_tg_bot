@@ -37,7 +37,7 @@ class TypeOfAnswer(ABC):
 class AnswerDB(TypeOfAnswer):
     def __init__(self, session: Session):
         self.session: Session = session
-        self.text = 'Сколько различных видео получали новые просмотры 25 ноября 2025?'
+        self.text = 'На сколько просмотров в сумме выросли все видео 27 ноября 2025?'
 
     def all_video(self):
         return self.session.query(func.count(Videos.id)).scalar()
@@ -64,7 +64,17 @@ class AnswerDB(TypeOfAnswer):
             Snapshots.delta_views_count > 0).count()
 
     def products_of_creator(self):
-        return super().products_of_creator()
+        id_ = re.search(r'id (\w+)', self.text).group().replace("id ", '')
+        date_str = re.search(r'с (\d{1,2} \w+ \d{4})', self.text).group()
+        date_obj_1 = datetime.strptime(date_str.replace('с ', ''), '%d %B %Y').date()
+        date_str = re.search(r'по (\d{1,2} \w+ \d{4})', self.text).group()
+        date_obj_2 = datetime.strptime(date_str.replace('по ', ''), '%d %B %Y').date()
+        return self.session.query(Videos.id).filter(Videos.creator_id == id_,
+                                    Videos.created_at.between(date_obj_1, date_obj_2)).count()
 
     def count_video(self):
-        return super().count_video()
+        match = re.search(r'\d{1,2} \w+ \d{4}', self.text)
+        date_obj = datetime.strptime(match.group(), '%d %B %Y').date()
+        return self.session.query(func.sum(Snapshots.delta_views_count).label('total')).filter(
+            func.date(Snapshots.created_at) == date_obj,
+            Snapshots.delta_views_count > 0).scalar()

@@ -15,6 +15,7 @@ config = Config.model_validate_yaml("app/config/config.yaml")
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker, relationship
 from app.database.models import Base, Videos, Snapshots
+from datetime import date
 
 # Инициализируем движок и создаём таблицы
 engine = create_engine(config.db.create_connect_alchemy())
@@ -24,11 +25,11 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-video = AnswerDB(session).new_views_video()
+video = AnswerDB(session).count_video()
 
-# video = session.query(Snapshots.video_id).order_by(Snapshots.video_id.desc()).filter(
-#     func.date(Snapshots.created_at) == video.date(),
-#     Snapshots.delta_views_count > 0).count()
+# video = session.query(func.sum(Snapshots.delta_views_count).label('total')).filter(
+#     func.date(Snapshots.created_at) == date(2025, 11, 28),
+#     Snapshots.delta_views_count > 0).scalar()
 
 print((video))
 
