@@ -5,7 +5,7 @@ from typing import Dict
 
 nltk.download('punkt_tab')
 
-class AnswerToQuestion:
+class Answers:
     def __init__(self, path = 'app/static/question.json', best_rank: int = 70, column='video_snapshots'):
         self.dataOfQuestion = self.load_data(path)[column]
         self.best_rank = best_rank
@@ -45,7 +45,8 @@ class AnswerToQuestion:
                     result = name
         return result
 
+
 text = input('Question: ')
-answer = AnswerToQuestion()
+answer = Answers()
 intention = answer(text)
 print('Answer:', intention)
