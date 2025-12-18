@@ -12,6 +12,10 @@ db:
 tg:
   token: 9482390:jkfdsnkcs32231k
 ```
+Установка зависимостей:
+```
+pip install -r requirements.txt
+```
 Затем через терминал запускаете проект командой:
 ```bash
 python3 main.py
