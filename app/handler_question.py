@@ -14,7 +14,7 @@ class Answers:
     def __call__(self, text):
         intention = self.get_intent(text)
         if intention:
-            return intention
+            return self.dataOfQuestion[intention]['answer'][0]
         return self.failure_phrases
 
     @staticmethod
@@ -45,8 +45,5 @@ class Answers:
                     result = name
         return result
 
-
-text = input('Question: ')
-answer = Answers()
-intention = answer(text)
-print('Answer:', intention)
+# answer = Answers()
+# print(answer("Сколько всего видео есть в системе"))

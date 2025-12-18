@@ -22,5 +22,9 @@ class DB(BaseModel):
     def create_connect_alchemy(self):
         return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
 
+class TG(BaseModel):
+    token: str
+
 class Config(YamlProject):
     db: DB
+    tg: TG

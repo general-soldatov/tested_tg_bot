@@ -1,36 +1,31 @@
-from app.config.config import Config
-from app.database.handler import AnswerDB
+from aiogram import Bot, Dispatcher
+from aiogram.filters import Command
+from aiogram.types import Message
 
-config = Config.model_validate_yaml("app/config/config.yaml")
-# try:
-#     connection = psycopg2.connect(config.db.create_connect())
-#     print("Подключение успешно установлено!")
-# except Exception as e:
-#     print(f"Ошибка подключения: {e}")
-# finally:
-#     if connection:
-#         connection.close()
-#     print("Соединение закрыто.")
+from app.ai_router import router, config, session
+from app.middleware import MiddleAI
 
-from sqlalchemy import create_engine, func
-from sqlalchemy.orm import sessionmaker, relationship
-from app.database.models import Base, Videos, Snapshots
-from datetime import date
+def bases(func):
+    def inner(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+            print(*args, **kwargs)
+        except Exception as e:
+            print(e)
+        finally:
+            session.close()
+    return inner
 
-# Инициализируем движок и создаём таблицы
-engine = create_engine(config.db.create_connect_alchemy())
-Base.metadata.create_all(engine)
+bot = Bot(config.tg.token)
+dp = Dispatcher()
+dp.update.middleware(MiddleAI())
+dp.include_router(router)
+# video = AnswerDB(session).count_video()
 
-# Создаём сессию
-Session = sessionmaker(bind=engine)
-session = Session()
+@bases
+@dp.message(Command('start'))
+async def start(message: Message):
+    await message.answer(f'Hello, Dear {message.from_user.first_name}!')
 
-video = AnswerDB(session).count_video()
-
-# video = session.query(func.sum(Snapshots.delta_views_count).label('total')).filter(
-#     func.date(Snapshots.created_at) == date(2025, 11, 28),
-#     Snapshots.delta_views_count > 0).scalar()
-
-print((video))
-
-session.close()
+if __name__ == "__main__":
+    dp.run_polling(bot)
